@@ -1,9 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from mangum import Mangum
 from .environments import Environments
-from .repo.item_repository_mock import ItemRepositoryMock
 from .errors.entity_errors import ParamNotValidated
-from .enums.item_type_enum import ItemTypeEnum
 from .entities.item import Item
 
 app = FastAPI()
@@ -52,13 +50,13 @@ def create_item(request: dict):
         raise HTTPException(status_code=400, detail="Item type is required")
     if type(item_type) != str:
         raise HTTPException(status_code=400, detail="Item type must be a string")
-    if item_type not in [possible_type.value for possible_type in ItemTypeEnum]:
+    if item_type not in [possible_type.value for possible_type in ItemTypeEnum]: # type: ignore
         raise HTTPException(status_code=400, detail="Item type is not a valid one")
 
     admin_permission = request.get("admin_permission")
 
     try:
-        item = Item(name=name, price=price, item_type=ItemTypeEnum[item_type], admin_permission=admin_permission)
+        item = Item(name=name, price=price, item_type=ItemTypeEnum[item_type], admin_permission=admin_permission) # type: ignore
     except ParamNotValidated as err:
         raise HTTPException(status_code=400, detail=err.message)
 
@@ -115,9 +113,9 @@ def update_item(request: dict):
     if item_type_value != None:
         if type(item_type_value) != str:
             raise HTTPException(status_code=400, detail="Item type must be a string")
-        if item_type_value not in [possible_type.value for possible_type in ItemTypeEnum]:
+        if item_type_value not in [possible_type.value for possible_type in ItemTypeEnum]: # type: ignore
             raise HTTPException(status_code=400, detail="Item type is not a valid one")
-        item_type = ItemTypeEnum[item_type_value]
+        item_type = ItemTypeEnum[item_type_value] # type: ignore
     else:
         item_type = None
 
