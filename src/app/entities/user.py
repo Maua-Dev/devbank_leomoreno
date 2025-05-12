@@ -1,11 +1,10 @@
 from typing import Tuple
 from ..errors.entity_errors import ParamNotValidated
 
-
 class User:
     name: str
-    agency: str
-    account: str
+    agency: str  # Ex: "0000"
+    account: str  # Ex: "00000-0"
     current_balance: float
 
     def __init__(self, name: str = None, agency: str = None, account: str = None, current_balance: float = None):
@@ -33,9 +32,9 @@ class User:
     def validate_name(name: str) -> Tuple[bool, str]:
         if name is None:
             return False, "Name is required"
-        if type(name) != str:
+        if not isinstance(name, str):
             return False, "Name must be a string"
-        if len(name) < 3:
+        if len(name.strip()) < 3:
             return False, "Name must be at least 3 characters long"
         return True, ""
 
@@ -43,40 +42,40 @@ class User:
     def validate_agency(agency: str) -> Tuple[bool, str]:
         if agency is None:
             return False, "Agency is required"
-        if type(agency) != str:
+        if not isinstance(agency, str):
             return False, "Agency must be a string"
         if len(agency) != 4 or not agency.isdigit():
-            return False, "Agency must be 4 numeric digits"
+            return False, "Agency must be a 4-digit string"
         return True, ""
 
     @staticmethod
     def validate_account(account: str) -> Tuple[bool, str]:
         if account is None:
             return False, "Account is required"
-        if type(account) != str:
+        if not isinstance(account, str):
             return False, "Account must be a string"
-        if len(account) != 8 or account[5] != '-' or not (account[:5] + account[6:]).isdigit():
-            return False, "Account must be in the format 00000-0"
+        if not account[:-2].isdigit() or account[-2] != '-' or not account[-1].isdigit():
+            return False, "Account must follow the format '00000-0'"
         return True, ""
 
     @staticmethod
     def validate_current_balance(current_balance: float) -> Tuple[bool, str]:
         if current_balance is None:
             return False, "Current balance is required"
-        if type(current_balance) != float:
+        if not isinstance(current_balance, float):
             return False, "Current balance must be a float"
         if current_balance < 0:
-            return False, "Current balance must be non-negative"
+            return False, "Current balance cannot be negative"
         return True, ""
 
     @staticmethod
     def validate_user_id(user_id: int) -> Tuple[bool, str]:
         if user_id is None:
             return False, "Missing 'user_id' parameter"
-        if type(user_id) != int:
-            return False, "Parameter 'user_id' must be an integer"
+        if not isinstance(user_id, int):
+            return False, "User ID must be an integer"
         if user_id < 0:
-            return False, "Parameter 'user_id' must be a positive integer"
+            return False, "User ID must be a positive integer"
         return True, ""
 
     def to_dict(self):
@@ -96,4 +95,7 @@ class User:
         )
 
     def __repr__(self):
-        return f"User(name={self.name}, agency={self.agency}, account={self.account}, current_balance={self.current_balance})"
+        return (
+            f"User(name={self.name}, agency={self.agency}, "
+            f"account={self.account}, current_balance={self.current_balance})"
+        )
